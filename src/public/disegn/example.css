@@ -1,0 +1,224 @@
+/* ===== Nexus Battles IV – Estilo Medieval para Registro ===== */
+:root{
+  --bg-dark: #0d0a06;
+  --bg-deep: #1a130d;
+  --ink: #2a2119;
+  --parchment: #f3e6c6;
+  --parchment-dark: #e7d8ad;
+  --gold: #c7a243;
+  --gold-deep:#a8842f;
+  --crimson:#7a1f1f;
+  --emerald:#2e6b4e;
+  --charcoal:#2b2b2b;
+  --glow:#ffd477;
+}
+
+*{ box-sizing: border-box; }
+
+html, body{
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body{
+  font-family: "Cinzel", "IM Fell English", Georgia, serif; /* si quieres, carga estas fuentes después */
+  color: #eee;
+  background:
+    radial-gradient(1200px 600px at 10% 0%, rgba(199,162,67,0.06), transparent 55%),
+    radial-gradient(900px 500px at 90% 100%, rgba(122,31,31,0.08), transparent 60%),
+    linear-gradient(180deg, var(--bg-dark), var(--bg-deep) 35%, #0e0b07 100%);
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+/* Título con vibe de estandarte */
+h1{
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  letter-spacing: 1px;
+  color: var(--glow);
+  text-shadow:
+    0 0 6px rgba(255,212,119,0.35),
+    0 2px 0 #3b2a12;
+  position: relative;
+  font-weight: 700;
+}
+
+h1::before, h1::after{
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+  width: 60px; height: 10px;
+  margin: 0 .75rem;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 999px;
+  filter: drop-shadow(0 0 6px rgba(199,162,67,.4));
+}
+
+/* Contenedor tipo pergamino */
+#registerForm{
+  width: min(520px, 92vw);
+  position: relative;
+  padding: 2.25rem 1.5rem 2.5rem;
+  color: var(--ink);
+  background:
+    radial-gradient(200% 80% at 50% 0%, rgba(255,255,255,0.12), transparent 60%),
+    linear-gradient(180deg, var(--parchment), var(--parchment-dark) 85%, #e1cf9a 100%);
+  border: 2px solid #c2a66f;
+  border-radius: 18px;
+  box-shadow:
+    0 25px 60px rgba(0,0,0,.55),
+    inset 0 2px 0 rgba(255,255,255,.3),
+    inset 0 -2px 0 rgba(0,0,0,.08);
+  isolation: isolate;
+}
+
+/* Bordes irregulares del pergamino */
+#registerForm::before, #registerForm::after{
+  content:"";
+  position:absolute; left: 0; right: 0;
+  height: 14px;
+  background:
+    repeating-linear-gradient(90deg,
+      #c2a66f, #c2a66f 6px,
+      #b99558 6px, #b99558 12px);
+  opacity:.28;
+  border-radius: 18px;
+  filter: blur(0.2px);
+  pointer-events: none;
+}
+#registerForm::before{ top:-6px; }
+#registerForm::after{ bottom:-6px; }
+
+/* “Bastones” del estandarte */
+#registerForm .mast{
+  position:absolute; inset: -20px -20px auto auto;
+  width: 26px; height: 70px;
+  background: linear-gradient(180deg,#5a4a2e,#2b2315);
+  border: 1px solid #1d170d; border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 12px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.1);
+}
+#registerForm .mast.left{
+  inset: -20px auto auto -20px;
+}
+
+/* Campos */
+#registerForm input{
+  width: 100%;
+  display:block;
+  margin: 0 0 1rem 0;
+  padding: .9rem 1rem;
+  font: 600 1rem/1.1 "Source Serif 4", Georgia, serif;
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, #fffdf6, #f8f0d6 90%);
+  border: 1.5px solid #b08d48;
+  border-radius: 12px;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.7),
+    0 1px 0 rgba(255,255,255,.2);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .06s ease;
+}
+
+#registerForm input::placeholder{
+  color: #7a6a4c;
+  opacity: .9;
+}
+
+#registerForm input:hover{
+  border-color: var(--gold);
+}
+
+#registerForm input:focus{
+  border-color: var(--gold-deep);
+  box-shadow:
+    0 0 0 3px rgba(199,162,67,.25),
+    inset 0 1px 0 rgba(255,255,255,.9);
+  transform: translateY(-1px);
+}
+
+/* Botón – sello de cera */
+#registerForm button{
+  width: 100%;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.95rem 1.2rem;
+  font: 700 1.05rem/1 "Cinzel", Georgia, serif;
+  letter-spacing: .5px;
+  color: #f7e9dd;
+  background: radial-gradient(120% 140% at 30% 30%, #a53030, #6a1b1b 70%);
+  border-radius: 14px;
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.15),
+    inset 0 -2px 0 rgba(0,0,0,.25);
+  position: relative;
+  transition: transform .08s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+/* Detalle del sello */
+#registerForm button::after{
+  content:"";
+  position:absolute; right: 18px; top: 50%;
+  transform: translateY(-50%);
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background:
+    radial-gradient(60% 60% at 35% 35%, #e8b15b, transparent 70%),
+    radial-gradient(100% 100% at 50% 50%, #7a1f1f, #4e1313);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.15),
+    inset 0 -2px 0 rgba(0,0,0,.25),
+    0 0 0 2px rgba(0,0,0,.15);
+  opacity:.9;
+  pointer-events: none;
+}
+
+#registerForm button:hover{
+  filter: brightness(1.03);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -2px 0 rgba(0,0,0,.28);
+}
+
+#registerForm button:active{
+  transform: translateY(2px);
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(0,0,0,.25);
+}
+
+/* Pequeños adornos */
+.form-divider{
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #b08d48, transparent);
+  margin: 1.25rem 0 1rem;
+  opacity: .8;
+}
+
+.helper{
+  text-align: center;
+  font: 700 .9rem/1 "IM Fell English", Georgia, serif;
+  color: #4b3a1b;
+  letter-spacing: .3px;
+}
+
+/* Responsivo */
+@media (max-width: 420px){
+  #registerForm{
+    padding: 1.4rem 1rem 1.8rem;
+  }
+  h1{ font-size: 1.6rem; }
+}
+
+/* A11y foco por teclado */
+:focus-visible{
+  outline: 3px dashed rgba(199,162,67,.6);
+  outline-offset: 2px;
+}

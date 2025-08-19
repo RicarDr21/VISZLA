@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="../disegn/example.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=IM+Fell+English:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <title>Registro - Nexus Battles IV</title>
+</head>
+<body>
+  <h1>Registro de Usuario</h1>
+  
+  <form id="registerForm">
+    <!-- Nombres -->
+    <input type="text" name="nombres" placeholder="Nombres" required /><br>
+
+    <!-- Apellidos -->
+    <input type="text" name="apellidos" placeholder="Apellidos" required /><br>
+
+    <!-- Apodo -->
+    <input type="text" name="apodo" placeholder="Apodo" required /><br>
+
+    <!-- Avatar -->
+    <input type="text" name="avatar" placeholder="Avatar" required /><br>
+
+    <!-- Email -->
+    <input type="email" name="email" placeholder="Correo electrónico" required /><br>
+
+    <!-- Contraseña -->
+    <input type="password" name="password" placeholder="Contraseña" required /><br>
+
+    <!-- Confirmar contraseña -->
+    <input type="password" name="confirmPassword" placeholder="Confirmar contraseña" required /><br>
+
+    <button type="submit">Registrarse</button>
+  </form>
+
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        nombres: e.target.nombres.value.trim(),
+        email: e.target.email.value.trim().toLowerCase(),
+        password: e.target.password.value,
+        confirmPassword: e.target.confirmPassword.value,
+        rol: e.target.rol.value
+      };
+
+      // Validación básica en frontend
+      if (data.password !== data.confirmPassword) {
+        alert("⚠️ Las contraseñas no coinciden.");
+        return;
+      }
+
+      // Simulación de envío al backend
+      console.log("Datos enviados:", data);
+
+      // Aquí iría el fetch POST a tu backend con JSON
+      // Ejemplo:
+      /*
+      const res = await fetch("/api/usuarios/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      console.log(result);
+      */
+
+      alert("Formulario enviado (simulación). Revisa la consola.");
+    });
+  </script>
+</body>
+</html>
