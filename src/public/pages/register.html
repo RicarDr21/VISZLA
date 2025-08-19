@@ -40,10 +40,12 @@
 
       const data = {
         nombres: e.target.nombres.value.trim(),
+        apellidos: e.target.apellidos.value.trim(),
+        apodo: e.target.apodo.value.trim(),
+        avatar: e.target.avatar.value,
         email: e.target.email.value.trim().toLowerCase(),
         password: e.target.password.value,
         confirmPassword: e.target.confirmPassword.value,
-        rol: e.target.rol.value
       };
 
       // Validación básica en frontend
@@ -57,17 +59,16 @@
 
       // Aquí iría el fetch POST a tu backend con JSON
       // Ejemplo:
-      /*
-      const res = await fetch("/api/usuarios/register", {
+
+      const res = await fetch("http://localhost:3000/api/usuarios/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       });
       const result = await res.json();
       console.log(result);
-      */
 
-      alert("Formulario enviado (simulación). Revisa la consola.");
+      alert("Usuario registrado exitosamente");
     });
   </script>
 </body>

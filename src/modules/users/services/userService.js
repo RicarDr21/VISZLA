@@ -1,10 +1,10 @@
 // src/modules/users/services/user.service.js
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const Usuario = require("../models/user.model");
-const emailService = require("../../email/services/email.service");
+const Usuario = require("../models/userModel");
+const emailService = require("../../email/services/emailServices");
 
-async function registerUser({ nombres, email, password }) {
+async function registerUser({ nombres, apellidos, apodo, avatar, email, password }) {
   // verificar que no exista
   const existingUser = await Usuario.findOne({ email });
   if (existingUser) {
@@ -19,10 +19,13 @@ async function registerUser({ nombres, email, password }) {
 
   const newUser = new Usuario({
     nombres,
+    apellidos,
+    apodo,
+    avatar,
     email,
     password: hashedPassword,
     confirmacionToken: token,
-    confirmacionExpira: Date.now() + 3600000 // 1 hora
+    confirmacionExpira: Date.now() + 3600000
   });
 
   await newUser.save();

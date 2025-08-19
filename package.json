@@ -7,12 +7,13 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "dotenv": "^16.4.5",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mjml": "^4.15.3",
-    "mongoose": "^8.7.0",
+    "mongoose": "^8.17.2",
     "nodemailer": "^6.9.15"
   },
   "devDependencies": {
