@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Usuarios - Panel de Administración</title>
+  <link rel="stylesheet" href="/disegn/detalles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Usuarios del Sistema</h1>
+    <p class="subtitle">Gestiona y revisa el estado de los usuarios registrados.</p>
+
+    <!-- Panel de filtros y orden -->
+    <div class="controls">
+      <div class="filter-group">
+        <label for="search">Buscar:</label>
+        <input type="text" id="search" placeholder="Nombre o correo..." />
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-role">Filtrar por rol:</label>
+        <select id="filter-role">
+          <option value="">Todos</option>
+          <option value="player">player</option>
+          <option value="admin">admin</option>
+          <option value="staff">staff</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-status">Estado:</label>
+        <select id="filter-status">
+          <option value="">Todos</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sort">Ordenar por:</label>
+        <select id="sort">
+          <option value="nombre">Nombre</option>
+          <option value="rol">Rol</option>
+          <option value="estado">Estado</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="order">Dirección:</label>
+        <select id="order">
+          <option value="asc">Ascendente</option>
+          <option value="desc">Descendente</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Lista de usuarios -->
+    <div class="users-grid" id="users-container">
+      <!-- Generado dinámicamente -->
+    </div>
+  </div>
+
+  <script src="/js/detalles.js"></script>
+</body>
+</html>

@@ -13,6 +13,9 @@ app.get('/health', (_req, res) => {
 
 app.get('/', (_req, res) => res.redirect('/pages/users.html'));
 
+app.get('/detalles', (_req, res) => res.redirect('/pages/detalles.html'));
+app.get('/perfil', (_req, res) => res.redirect('/pages/perfil.html'));
+
 app.use('/users', require('./modules/users/routes/userRoute'));
 app.use('/auth', require('./modules/auth/routes/authRoute'));
 
