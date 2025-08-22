@@ -114,6 +114,7 @@
       </div>
 
       <button type="submit" class="btn btn-save">Guardar Cambios</button>
+      <div id="successMsg" class="success" style="display: none;"></div>
     </form>
 
     <button id="closeAccountBtn" class="btn btn-close">Cerrar Cuenta</button>
@@ -126,46 +127,111 @@
       return emailRegex.test(email);
     }
 
-    // Datos actuales del usuario (simulación)
-    let currentUser = {
-      name: "Ana Pérez",
-      email: "ana.perez@example.com"
-    };
+    // ID del usuario (normalmente vendría del backend o del token)
+    const userId = '68a88d2af247433fb7c097c2'; // ← Reemplaza con el ID real del usuario logueado
 
-    // Cargar datos del usuario en los campos
-    document.getElementById('name').value = currentUser.name;
-    document.getElementById('email').value = currentUser.email;
+    // Cargar datos del usuario desde el backend (opcional)
+    async function loadUser() {
+      try {
+        const res = await fetch(`/users/${userId}`,{headers: { 'x-role': 'admin' }});
+        if (res.ok) {
+          const user = await res.json();
+          document.getElementById('name').value = user.name || '';
+          document.getElementById('email').value = user.email || '';
+        } else {
+          alert('Error al cargar los datos del usuario.');
+        }
+      } catch (err) {
+        console.error('Error al conectar con el servidor:', err);
+        alert('No se pudo conectar al servidor.');
+      }
+    }
+
+    // Actualizar perfil
+    async function updateUser(name, email) {
+      try {
+        const res = await fetch(`/users/${userId}/update`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-role': 'admin' // Simulación de rol admin
+          },
+          body: JSON.stringify({ name, email })
+        });
+
+        const data = await res.json();
+        return { ok: res.ok, body: data };
+      } catch (err) {
+        return { ok: false, body: { message: 'Error de conexión' } };
+      }
+    }
+
+    // Eliminar cuenta
+    async function deleteUser() {
+      try {
+        const res = await fetch(`/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'x-role': 'admin' // Simulación de rol admin
+          }
+        });
+
+        const data = await res.json();
+        return { ok: res.ok, body: data };
+      } catch (err) {
+        return { ok: false, body: { message: 'Error de conexión' } };
+      }
+    }
+
+    // Cargar datos del usuario al iniciar
+    loadUser();
 
     // Manejar el envío del formulario
-    document.getElementById('profileForm').addEventListener('submit', function(e) {
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const errorDiv = document.getElementById('emailError');
+      const successDiv = document.getElementById('successMsg');
 
-      // Limpiar mensajes anteriores
+      // Limpiar mensajes
       errorDiv.textContent = '';
+      successDiv.style.display = 'none';
 
-      // Validar email usando la función adicional
+      // Validar email
       if (!isValidEmail(email)) {
         errorDiv.textContent = 'Por favor ingresa un correo electrónico válido.';
         return;
       }
 
-      // Simular guardado exitoso
-      currentUser.name = name;
-      currentUser.email = email;
+      // Llamada al API para actualizar
+      const result = await updateUser(name, email);
 
-      alert(`Perfil actualizado:\nNombre: ${name}\nEmail: ${email}`);
+      if (result.ok) {
+        successDiv.textContent = 'Perfil actualizado con éxito.';
+        successDiv.style.display = 'block';
+      } else {
+        if (result.body.message.includes('ya está en uso')) {
+          errorDiv.textContent = 'Este correo ya está registrado.';
+        } else {
+          errorDiv.textContent = 'Error: ' + result.body.message;
+        }
+      }
     });
 
     // Manejar cierre de cuenta
-    document.getElementById('closeAccountBtn').addEventListener('click', function() {
+    document.getElementById('closeAccountBtn').addEventListener('click', async function() {
       if (confirm("¿Estás seguro de que deseas cerrar tu cuenta? Esta acción no se puede deshacer.")) {
-        alert("Tu cuenta ha sido cerrada. Gracias por usar nuestro servicio.");
-        // Aquí iría la lógica para cerrar la cuenta (llamada a API, logout, etc.)
-        // Por ejemplo: window.location.href = '/logout';
+        const result = await deleteUser();
+
+        if (result.ok) {
+          alert("Tu cuenta ha sido eliminada permanentemente.");
+          // Redirigir al logout o a la página principal
+          window.location.href = '/'; // o '/logout'
+        } else {
+          alert("No se pudo eliminar la cuenta: " + result.body.message);
+        }
       }
     });
   </script>
