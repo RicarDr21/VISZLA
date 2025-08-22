@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Perfil</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .profile-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4d90fe;
+      box-shadow: 0 0 5px rgba(77, 144, 254, 0.3);
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn-save {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .btn-close {
+      background-color: #f44336;
+      color: white;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .error {
+      color: #f44336;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .success {
+      color: #4CAF50;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="profile-container">
+    <h2>Editar Perfil</h2>
+
+    <form id="profileForm">
+      <div class="form-group">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" name="email" required />
+        <div id="emailError" class="error"></div>
+      </div>
+
+      <button type="submit" class="btn btn-save">Guardar Cambios</button>
+    </form>
+
+    <button id="closeAccountBtn" class="btn btn-close">Cerrar Cuenta</button>
+  </div>
+
+  <script>
+    // Función para validar email
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // Datos actuales del usuario (simulación)
+    let currentUser = {
+      name: "Ana Pérez",
+      email: "ana.perez@example.com"
+    };
+
+    // Cargar datos del usuario en los campos
+    document.getElementById('name').value = currentUser.name;
+    document.getElementById('email').value = currentUser.email;
+
+    // Manejar el envío del formulario
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const errorDiv = document.getElementById('emailError');
+
+      // Limpiar mensajes anteriores
+      errorDiv.textContent = '';
+
+      // Validar email usando la función adicional
+      if (!isValidEmail(email)) {
+        errorDiv.textContent = 'Por favor ingresa un correo electrónico válido.';
+        return;
+      }
+
+      // Simular guardado exitoso
+      currentUser.name = name;
+      currentUser.email = email;
+
+      alert(`Perfil actualizado:\nNombre: ${name}\nEmail: ${email}`);
+    });
+
+    // Manejar cierre de cuenta
+    document.getElementById('closeAccountBtn').addEventListener('click', function() {
+      if (confirm("¿Estás seguro de que deseas cerrar tu cuenta? Esta acción no se puede deshacer.")) {
+        alert("Tu cuenta ha sido cerrada. Gracias por usar nuestro servicio.");
+        // Aquí iría la lógica para cerrar la cuenta (llamada a API, logout, etc.)
+        // Por ejemplo: window.location.href = '/logout';
+      }
+    });
+  </script>
+
+</body>
+</html>
