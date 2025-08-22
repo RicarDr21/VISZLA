@@ -68,4 +68,46 @@ const reactivate = async (req, res) => {
   }
 };
 
-module.exports = { postUser, getUsers, deleteUser, suspend, reactivate };
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email } = req.body;
+
+    if (!req.user || (req.user.role !== 'admin' && req.user.id !== id)) {
+      return res.status(403).json({ message: 'Acceso denegado' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { name, email },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    return res.json({ message: 'Usuario actualizado', user });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ message: 'El correo ya está en uso' });
+    }
+    return res.status(400).json({ message: err.message });
+  }
+};
+
+
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).lean();
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    return res.json(user);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { postUser, getUsers, deleteUser, suspend, reactivate, updateUser, getUserById };

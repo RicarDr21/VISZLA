@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Perfil</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .profile-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4d90fe;
+      box-shadow: 0 0 5px rgba(77, 144, 254, 0.3);
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn-save {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .btn-close {
+      background-color: #f44336;
+      color: white;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .error {
+      color: #f44336;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .success {
+      color: #4CAF50;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="profile-container">
+    <h2>Editar Perfil</h2>
+
+    <form id="profileForm">
+      <div class="form-group">
+        <label for="name">Nombre</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" name="email" required />
+        <div id="emailError" class="error"></div>
+      </div>
+
+      <button type="submit" class="btn btn-save">Guardar Cambios</button>
+      <div id="successMsg" class="success" style="display: none;"></div>
+    </form>
+
+    <button id="closeAccountBtn" class="btn btn-close">Cerrar Cuenta</button>
+  </div>
+
+  <script>
+    // Función para validar email
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // ID del usuario (normalmente vendría del backend o del token)
+    const userId = '68a88d2af247433fb7c097c2'; // ← Reemplaza con el ID real del usuario logueado
+
+    // Cargar datos del usuario desde el backend (opcional)
+    async function loadUser() {
+      try {
+        const res = await fetch(`/users/${userId}`,{headers: { 'x-role': 'admin' }});
+        if (res.ok) {
+          const user = await res.json();
+          document.getElementById('name').value = user.name || '';
+          document.getElementById('email').value = user.email || '';
+        } else {
+          alert('Error al cargar los datos del usuario.');
+        }
+      } catch (err) {
+        console.error('Error al conectar con el servidor:', err);
+        alert('No se pudo conectar al servidor.');
+      }
+    }
+
+    // Actualizar perfil
+    async function updateUser(name, email) {
+      try {
+        const res = await fetch(`/users/${userId}/update`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-role': 'admin' // Simulación de rol admin
+          },
+          body: JSON.stringify({ name, email })
+        });
+
+        const data = await res.json();
+        return { ok: res.ok, body: data };
+      } catch (err) {
+        return { ok: false, body: { message: 'Error de conexión' } };
+      }
+    }
+
+    // Eliminar cuenta
+    async function deleteUser() {
+      try {
+        const res = await fetch(`/users/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'x-role': 'admin' // Simulación de rol admin
+          }
+        });
+
+        const data = await res.json();
+        return { ok: res.ok, body: data };
+      } catch (err) {
+        return { ok: false, body: { message: 'Error de conexión' } };
+      }
+    }
+
+    // Cargar datos del usuario al iniciar
+    loadUser();
+
+    // Manejar el envío del formulario
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const errorDiv = document.getElementById('emailError');
+      const successDiv = document.getElementById('successMsg');
+
+      // Limpiar mensajes
+      errorDiv.textContent = '';
+      successDiv.style.display = 'none';
+
+      // Validar email
+      if (!isValidEmail(email)) {
+        errorDiv.textContent = 'Por favor ingresa un correo electrónico válido.';
+        return;
+      }
+
+      // Llamada al API para actualizar
+      const result = await updateUser(name, email);
+
+      if (result.ok) {
+        successDiv.textContent = 'Perfil actualizado con éxito.';
+        successDiv.style.display = 'block';
+      } else {
+        if (result.body.message.includes('ya está en uso')) {
+          errorDiv.textContent = 'Este correo ya está registrado.';
+        } else {
+          errorDiv.textContent = 'Error: ' + result.body.message;
+        }
+      }
+    });
+
+    // Manejar cierre de cuenta
+    document.getElementById('closeAccountBtn').addEventListener('click', async function() {
+      if (confirm("¿Estás seguro de que deseas cerrar tu cuenta? Esta acción no se puede deshacer.")) {
+        const result = await deleteUser();
+
+        if (result.ok) {
+          alert("Tu cuenta ha sido eliminada permanentemente.");
+          // Redirigir al logout o a la página principal
+          window.location.href = '/'; // o '/logout'
+        } else {
+          alert("No se pudo eliminar la cuenta: " + result.body.message);
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
