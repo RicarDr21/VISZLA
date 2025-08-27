@@ -1,6 +1,6 @@
 // src/modules/email/services/email.service.js
 const nodemailer = require("nodemailer");
-const { BASE_URL } = require("../../../config/env");
+require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
   host: "localhost",

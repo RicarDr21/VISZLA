@@ -3,72 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="../disegn/example.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=IM+Fell+English:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-  <title>Registro - Nexus Battles IV</title>
+  <title>Registro / Login - Nexus Battles IV</title>
+  <style>
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
-  <h1>Registro de Usuario</h1>
+  <h1 id="formTitle">Registro de Usuario</h1>
   
-  <form id="registerForm">
-    <!-- Nombres -->
-    <input type="text" name="nombres" placeholder="Nombres" required /><br>
+  <form id="userForm">
+    <!-- Campos de registro -->
+    <div id="extraFields">
+      <input type="text" name="nombres" placeholder="Nombres" /><br>
+      <input type="text" name="apellidos" placeholder="Apellidos" /><br>
+      <input type="text" name="apodo" placeholder="Apodo" /><br>
+      <input type="text" name="avatar" placeholder="Avatar (URL)" /><br>
+    </div>
 
-    <!-- Apellidos -->
-    <input type="text" name="apellidos" placeholder="Apellidos" required /><br>
-
-    <!-- Apodo -->
-    <input type="text" name="apodo" placeholder="Apodo" required /><br>
-
-    <!-- Avatar -->
-    <input type="text" name="avatar" placeholder="Avatar" required /><br>
-
-    <!-- Email -->
+    <!-- Campos comunes -->
     <input type="email" name="email" placeholder="Correo electrónico" required /><br>
-
-    <!-- Contraseña -->
     <input type="password" name="password" placeholder="Contraseña" required /><br>
 
-    <!-- Confirmar contraseña -->
-    <input type="password" name="confirmPassword" placeholder="Confirmar contraseña" required /><br>
+    <!-- Confirmar contraseña solo en registro -->
+    <div id="confirmField">
+      <input type="password" name="confirmPassword" placeholder="Confirmar contraseña" />
+    </div><br>
 
-    <button type="submit">Registrarse</button>
+    <button type="submit" id="submitBtn">Registrarse</button>
   </form>
 
+  <!-- Botón para alternar -->
+  <button id="toggleMode">¿Ya tienes cuenta? Inicia sesión</button>
+
   <script>
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    let isRegister = true; // Estado inicial: Registro
+
+    const form = document.getElementById("userForm");
+    const toggleBtn = document.getElementById("toggleMode");
+    const formTitle = document.getElementById("formTitle");
+    const submitBtn = document.getElementById("submitBtn");
+    const extraFields = document.getElementById("extraFields");
+    const confirmField = document.getElementById("confirmField");
+
+    // Alternar entre registro y login
+    toggleBtn.addEventListener("click", () => {
+      isRegister = !isRegister;
+      if (isRegister) {
+        formTitle.textContent = "Registro de Usuario";
+        submitBtn.textContent = "Registrarse";
+        toggleBtn.textContent = "¿Ya tienes cuenta? Inicia sesión";
+        extraFields.classList.remove("hidden");
+        confirmField.classList.remove("hidden");
+      } else {
+        formTitle.textContent = "Iniciar Sesión";
+        submitBtn.textContent = "Entrar";
+        toggleBtn.textContent = "¿No tienes cuenta? Regístrate";
+        extraFields.classList.add("hidden");
+        confirmField.classList.add("hidden");
+      }
+    });
+
+    // Manejo de submit
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const data = {
-        nombres: e.target.nombres.value.trim(),
-        apellidos: e.target.apellidos.value.trim(),
-        apodo: e.target.apodo.value.trim(),
-        avatar: e.target.avatar.value,
         email: e.target.email.value.trim().toLowerCase(),
         password: e.target.password.value,
-        confirmPassword: e.target.confirmPassword.value,
       };
 
-      // Validación básica en frontend
-      if (data.password !== data.confirmPassword) {
-        alert("⚠️ Las contraseñas no coinciden.");
-        return;
+      if (isRegister) {
+        data.nombres = e.target.nombres.value.trim();
+        data.apellidos = e.target.apellidos.value.trim();
+        data.apodo = e.target.apodo.value.trim();
+        data.avatar = e.target.avatar.value;
+        data.confirmPassword = e.target.confirmPassword.value;
+
+        if (data.password !== data.confirmPassword) {
+          alert("⚠️ Las contraseñas no coinciden.");
+          return;
+        }
       }
 
-      // Simulación de envío al backend
-      console.log("Datos enviados:", data);
+      const endpoint = isRegister
+        ? "http://localhost:3000/api/usuarios/register"
+        : "http://localhost:3000/api/usuarios/login";
 
-      // Aquí iría el fetch POST a tu backend con JSON
-      // Ejemplo:
-
-      const res = await fetch("http://localhost:3000/api/usuarios/register", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
+
       const result = await res.json();
       console.log(result);
 
-      alert("Usuario registrado exitosamente");
+      if (res.ok) {
+        alert(isRegister ? "Usuario registrado exitosamente ✅" : "Login exitoso 🎉");
+        if (!isRegister && result.token) {
+          localStorage.setItem("token", result.token);
+          localStorage.setItem("rol", result.rol);
+
+          if (result.rol === "admin") {
+            window.location.href = "/pages/adminPanel.html"; // tu panel de admin
+          } else {
+            window.location.href = "/pages/HomeUser.html"; // menú usuario
+          }
+        }
+      } else {
+        alert(result.message || "❌ Ocurrió un error");
+      }
     });
   </script>
 </body>

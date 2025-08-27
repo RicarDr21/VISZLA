@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel admin</title>
+  <link rel="stylesheet" href="../disegn/example.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h1>Gestión de Usuarios</h1>
+
+  <input type="text" id="search" placeholder="Buscar por nombre o correo...">
+
+  <table>
+    <thead>
+      <tr>
+        <th>Avatar</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
+        <th>Correo</th>
+        <th>Apodo</th>
+        <th>Contraseña</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="usuariosBody">
+      <!-- Se llenará dinámicamente -->
+    </tbody>
+  </table>
+
+  <script>
+    let usuarios = [];
+
+    // Función para renderizar tabla
+    function renderUsuarios(lista) {
+      const tbody = document.getElementById("usuariosBody");
+      tbody.innerHTML = "";
+
+      lista.forEach(user => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td><img src="${user.avatar}" width="40" height="40" style="border-radius:50%"></td>
+          <td>${user.nombres}</td>
+          <td>${user.apellidos}</td>
+          <td>${user.email}</td>
+          <td>${user.apodo}</td>
+          <td>${user.password}</td>
+          <td>${user.rol}</td>
+          <td class="actions">
+            <button onclick="suspenderUsuario('${user._id}')">⛔ Suspender</button>
+            <button onclick="eliminarUsuario('${user._id}')">🗑️ Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Fetch inicial de usuarios
+    async function cargarUsuarios() {
+      try {
+        const token = localStorage.getItem("token"); // 👈 el token lo guardaste en el login
+        const res = await fetch("http://localhost:3000/api/admin/users", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // 👈 importante
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+        if (data.ok) {
+          usuarios = data.usuarios;
+          renderUsuarios(usuarios);
+        }
+      } catch (err) {
+        console.error("Error cargando usuarios:", err);
+      }
+    }
+
+    // Buscar usuarios en la tabla
+    document.getElementById("search").addEventListener("input", (e) => {
+      const texto = e.target.value.toLowerCase();
+      const filtrados = usuarios.filter(u =>
+        u.nombres.toLowerCase().includes(texto) ||
+        u.email.toLowerCase().includes(texto)
+      );
+      renderUsuarios(filtrados);
+    });
+
+    // Funciones de acciones 
+    // Suspender usuario
+    async function suspenderUsuario(id) {
+      const motivo = prompt("Ingrese el motivo de la suspensión:");
+      if (!motivo) return alert("Debes indicar un motivo");
+
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3000/api/admin/users/${id}/suspender`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // 👈 importante
+          },
+          body: JSON.stringify({ motivo })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("Usuario suspendido correctamente");
+          cargarUsuarios(); // recargar lista
+        } else {
+          alert("Error: " + data.msg);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al suspender usuario");
+      }
+    }
+
+    // Eliminar usuario
+    async function eliminarUsuario(id) {
+      const motivo = prompt("Ingrese el motivo de eliminación permanente:");
+      if (!motivo) return alert("Debes indicar un motivo");
+
+      if (!confirm("¿Seguro que quieres eliminar permanentemente este usuario?")) return;
+
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://localhost:3000/api/admin/users/${id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // 👈 importante
+          },
+          body: JSON.stringify({ motivo })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("Usuario eliminado permanentemente");
+          cargarUsuarios(); // recargar lista
+        } else {
+          alert("Error: " + data.msg);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar usuario");
+      }
+    }
+
+    // Cargar al inicio
+    cargarUsuarios();
+  </script>
+</body>
+</html>

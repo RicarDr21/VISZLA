@@ -1,5 +1,4 @@
-// src/modules/users/validators/user.validator.js
-
+// src/modules/users/validators/user.validate.js
 const validateEmail = require("../../../utils/validateEmail");
 
 function validateRegisterInput({ nombres, email, password, confirmPassword }) {
