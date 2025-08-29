@@ -38,14 +38,25 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// --- US-07: Suspender ---
+// --- US-07: Suspender (con motivo y duración) ---
 const suspend = async (req, res) => {
   try {
     const { id } = req.params;
+    const { motivoId, duracion } = req.body; // nuevo: recibe motivo y duración
+
     if (!req.user || req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Acceso denegado' });
     }
-    const user = await User.findByIdAndUpdate(id, { suspended: true }, { new: true });
+
+    const fechaInicio = new Date();
+    const fechaFin = duracion ? new Date(Date.now() + duracion * 24 * 60 * 60 * 1000) : null;
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { suspended: true, motivo: motivoId || null, fechaSuspension: fechaInicio, fechaReactivacion: fechaFin },
+      { new: true }
+    );
+
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
     return res.json({ message: 'Usuario suspendido', user });
   } catch (err) {
@@ -60,7 +71,13 @@ const reactivate = async (req, res) => {
     if (!req.user || req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Acceso denegado' });
     }
-    const user = await User.findByIdAndUpdate(id, { suspended: false }, { new: true });
+
+    const user = await User.findByIdAndUpdate(
+      id,
+      { suspended: false, motivo: null, fechaSuspension: null, fechaReactivacion: null },
+      { new: true }
+    );
+
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
     return res.json({ message: 'Usuario reactivado', user });
   } catch (err) {
