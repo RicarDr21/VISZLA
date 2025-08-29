@@ -15,8 +15,11 @@ app.get('/', (_req, res) => res.redirect('/pages/users.html'));
 
 app.use('/users', require('./modules/users/routes/userRoute'));
 app.use('/auth', require('./modules/auth/routes/authRoute'));
+app.use('/motivos', require('./modules/motivos/routes/motivoRoute'));
+
 
 // 404 simple para API /users
 app.use('/users', (_req, res) => res.status(404).json({ message: 'Ruta no encontrada' }));
+app.use('/motivos', (_req, res) => res.status(404).json({ message: 'Ruta no encontrada' }));
 
 module.exports = app;
