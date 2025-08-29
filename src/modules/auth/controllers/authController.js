@@ -68,6 +68,10 @@ const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
     const user = await User.findOne({
       resetToken: token,
       resetTokenExp: { $gt: Date.now() }
