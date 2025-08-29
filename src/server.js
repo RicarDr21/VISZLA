@@ -21,6 +21,7 @@ if (!MONGO_URI) {
       console.log(`   ▶ UI (usuarios):   ${base}/pages/users.html`);
       console.log(`   ▶ Healthcheck:      ${base}/health`);
       console.log('   ▶ API base:         /users');
+      console.log('▶ API motivos: /api/motivos')
     });
   } catch (err) {
     console.error('❌ Error al conectar a MongoDB:', err.message);
