@@ -18,7 +18,12 @@ const userSchema = new mongoose.Schema({
   fechaReactivacion: {
     type: Date,
     default: null
-  }
+  },
+
+  // Recuperación de contraseña
+  resetToken: { type: String, default: null },
+  resetTokenExp: { type: Date, default: null }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
