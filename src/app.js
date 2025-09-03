@@ -11,7 +11,7 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, service: 'VISZLA', time: new Date().toISOString() });
 });
 
-app.get('/', (_req, res) => res.redirect('/pages/users.html'));
+app.get('/', (_req, res) => res.redirect('/pages/register.html'));
 
 app.use('/users', require('./modules/users/routes/userRoute'));
 app.use('/auth', require('./modules/auth/routes/authRoute'));
