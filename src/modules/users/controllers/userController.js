@@ -17,10 +17,54 @@ async function register(req, res) {
     res.status(201).json({
       success: true,
       message: "Usuario registrado. Verifica tu correo para confirmar tu cuenta.",
-      userId: user._id
+      user: {
+        _id: user._id,
+        nombres: user.nombres,
+        apellidos: user.apellidos,
+        apodo: user.apodo,
+        avatar: user.avatar,
+        email: user.email,
+        rol: user.rol
+      }
     });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+async function login(req, res) {
+  try {
+    const { email, contrasena } = req.body;
+
+    // 1. Buscar usuario en Mongo
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // 2. Validar contraseña
+    const isMatch = await bcrypt.compare(contrasena, usuario.contrasena);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Contraseña incorrecta' });
+    }
+
+    // 3. Construir objeto user (sin exponer contraseña)
+    const user = {
+      id: usuario._id,
+      nombres: usuario.nombres,
+      email: usuario.email,
+      rol: usuario.rol
+    };
+
+    // 4. Responder con user
+    res.status(200).json({
+      message: 'Inicio de sesión exitoso',
+      user
+    });
+
+  } catch (error) {
+    console.error('❌ Error en login:', error);
+    res.status(500).json({ message: 'Error en el servidor' });
   }
 };
 
@@ -88,4 +132,4 @@ async function actualizarPerfil (req, res) {
   }
 };
 
-module.exports = { register, getProfile, actualizarPerfil};
+module.exports = { register, getProfile, actualizarPerfil, login};

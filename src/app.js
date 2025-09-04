@@ -21,7 +21,7 @@ app.use("/api", usuariosRoutes);
 app.use("/api/admin", adminRoutes)
 
 // Ruta raíz -> muestra el formulario de registro
-app.get("/", (req, res) => {
+app.get("/pages", (req, res) => {
   res.sendFile(path.join(__dirname, "public/pages/register.html"));
 });
 
