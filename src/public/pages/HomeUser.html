@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil del Jugador</title>
+  <link rel="stylesheet" href="../disegn/example.css">
+</head>
+<body>
+  <div class="perfil-container">
+    <h1>Mi Perfil</h1>
+
+    <!-- Avatar -->
+    <div class="perfil-avatar">
+      <img id="avatarPreview" src="../assets/default.png" alt="Avatar del jugador">
+      <input type="file" id="avatar" accept="image/*">
+    </div>
+
+    <!-- Formulario -->
+    <form id="perfilForm">
+      <!-- Nombres -->
+      <label for="nombres">Nombres:</label>
+      <input type="text" id="nombres" name="nombres" required>
+
+      <!-- Apellidos -->
+      <label for="apellidos">Apellidos:</label>
+      <input type="text" id="apellidos" name="apellidos" required>
+
+      <!-- Apodo -->
+      <label for="apodo">Apodo:</label>
+      <input type="text" id="apodo" name="apodo" required>
+
+      <!-- Correo (solo lectura) -->
+      <label for="email">Correo:</label>
+      <input type="text" id="email" name="email" readonly>
+
+      <!-- Cambio de contraseña -->
+      <h3>Cambiar Contraseña</h3>
+      <label for="passwordActual">Contraseña actual:</label>
+      <input type="password" id="passwordActual" name="passwordActual">
+
+      <label for="nuevaPassword">Nueva contraseña:</label>
+      <input type="password" id="nuevaPassword" name="nuevaPassword">
+
+      <label for="confirmarPassword">Confirmar nueva contraseña:</label>
+      <input type="password" id="confirmarPassword" name="confirmarPassword">
+
+      <!-- Botón Guardar -->
+      <button type="submit">Guardar cambios</button>
+    </form>
+
+    <!-- Mensajes de éxito o error -->
+    <div id="mensaje" class="mensaje"></div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    const mensajeDiv = document.getElementById("mensaje");
+
+    // Cargar datos del usuario
+    async function cargarUsuario() {
+      try {
+        const res = await fetch("http://localhost:3000/api/usuarios/profile", {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error("Error al cargar usuario");
+
+        const data = await res.json();
+        console.log("Usuario:", data);
+
+        document.getElementById("nombres").value = data.nombres || "";
+        document.getElementById("apellidos").value = data.apellidos || "";
+        document.getElementById("apodo").value = data.apodo || "";
+        document.getElementById("email").value = data.email || "";
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+
+    // Guardar cambios del perfil
+    document.getElementById("perfilForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const perfilData = {
+        nombres: document.getElementById("nombres").value,
+        apellidos: document.getElementById("apellidos").value,
+        apodo: document.getElementById("apodo").value,
+        passwordActual: document.getElementById("passwordActual").value,
+        nuevaPassword: document.getElementById("nuevaPassword").value,
+        confirmarPassword: document.getElementById("confirmarPassword").value
+      };
+
+      try {
+        const res = await fetch("http://localhost:3000/api/usuarios/perfil", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(perfilData)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Error al actualizar perfil");
+
+        mensajeDiv.textContent = "Perfil actualizado con éxito ✅";
+        mensajeDiv.style.color = "green";
+
+        // Actualizar vista con los datos nuevos
+        cargarUsuario();
+      } catch (error) {
+        mensajeDiv.textContent = error.message;
+        mensajeDiv.style.color = "red";
+      }
+    });
+
+    cargarUsuario();
+  </script>
+</body>
+</html>
