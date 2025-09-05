@@ -7,7 +7,7 @@ const { verificarToken, verificarAdmin } = require("../../../middlewares/auth");
 router.use(verificarToken, verificarAdmin);
 
 // Listar usuarios (con filtro opcional por nombre/correo)
-router.get("/users", adminController.getUsers);
+router.get("/users-listar", adminController.getUsers);
 
 // Suspender/Reactivar usuario
 router.put("/users/:id/suspender", async (req, res) => {

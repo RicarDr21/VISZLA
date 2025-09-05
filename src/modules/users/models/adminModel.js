@@ -7,7 +7,7 @@ exports.getUsers = async (req, res) => {
     const filter = search 
       ? { $or: [{ nombres: new RegExp(search, "i") }, { email: new RegExp(search, "i") }] }
       : {};
-    const users = await User.find(filter).select("nombres apellidos email rol estado");
+    const users = await User.find(filter).select("nombres apellidos apodo email rol estado");
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: "Error al obtener usuarios" });

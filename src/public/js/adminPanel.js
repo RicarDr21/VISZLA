@@ -1,25 +1,48 @@
+const userData = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+const token = userData?.token || "";
+
 const API = {
-  list: () => fetch('/users').then(r => r.json()),
+  list: (search = "") =>
+    fetch(`/api/admin/users-listar?search=${encodeURIComponent(search)}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    })
+    .then(r => r.json())
+    .then(data => data.usuarios || []),
+
   create: (body) =>
-    fetch('/users', {
+    fetch('/api/admin/users', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(body)
     }).then(r => r.json()),
-  remove: (id) =>
-    fetch(`/users/${id}`, {
+
+  remove: (id, motivo = "Eliminación desde panel") =>
+    fetch(`/api/admin/users/${id}`, {
       method: 'DELETE',
-      headers: { 'x-role': 'admin' } // simula admin
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ motivo })
     }).then(async r => ({ ok: r.ok, body: await r.json() })),
-  suspend: (id) =>
-    fetch(`/users/${id}/suspend`, {
+
+  suspend: (id, motivo = "Suspendido desde panel") =>
+    fetch(`/api/admin/users/${id}/suspender`, {
       method: 'PUT',
-      headers: { 'x-role': 'admin' }
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ motivo })
     }).then(async r => ({ ok: r.ok, body: await r.json() })),
+
   reactivate: (id) =>
-    fetch(`/users/${id}/reactivate`, {
+    fetch(`/api/admin/users/${id}/reactivar`, {
       method: 'PUT',
-      headers: { 'x-role': 'admin' }
+      headers: { "Authorization": `Bearer ${token}` }
     }).then(async r => ({ ok: r.ok, body: await r.json() })),
 };
 
@@ -36,20 +59,21 @@ function setMsg(text, type = 'muted') {
 
 function row(user) {
   const tr = document.createElement('tr');
-  const suspended = user.suspended === true;
+  const estado = user.estado || 'activo';
 
   tr.innerHTML = `
-    <td>${user.name ?? '-'}</td>
+    <td>${user.nombres ?? ''} ${user.apellidos ?? ''}</td>
+    <td>${user.apodo ?? '-'}</td>
     <td>${user.email ?? '-'}</td>
-    <td>${user.role ?? '-'}</td>
-    <td>${suspended ? 'Suspendido' : 'Activo'}</td>
+    <td>${user.rol ?? '-'}</td>
+    <td>${estado}</td>
     <td class="text-end">
       <div class="btn-group btn-group-sm" role="group">
-        ${suspended
+        ${estado === 'suspendido'
           ? `<button class="btn btn-success" data-act="reactivate" data-id="${user._id}">Reactivar</button>`
           : `<button class="btn btn-warning" data-act="suspend" data-id="${user._id}">Suspender</button>`
         }
-        <button class="btn btn-outline-danger" data-act="delete" data-id="${user._id}">Eliminar</button>
+        <button class="btn btn-outline-danger" data-act="delete" data-id="${user._id}">Banear</button>
       </div>
     </td>
   `;
@@ -61,19 +85,22 @@ function row(user) {
     const act = btn.dataset.act;
 
     if (act === 'delete') {
-      if (!confirm('¿Eliminar permanentemente este usuario?')) return;
+      if (!confirm('Banear permanentemente este usuario?')) return;
       const res = await API.remove(id);
-      setMsg(res.body?.message || (res.ok ? 'Eliminado' : 'Error'), res.ok ? 'success' : 'danger');
+      setMsg(res.body?.msg || (res.ok ? 'Eliminado' : 'Error'), res.ok ? 'success' : 'danger');
       load();
     }
+
     if (act === 'suspend') {
-      const res = await API.suspend(id);
-      setMsg(res.body?.message || (res.ok ? 'Suspendido' : 'Error'), res.ok ? 'warning' : 'danger');
+      const motivo = prompt('Motivo de la suspensión:', 'Incumplimiento de reglas');
+      const res = await API.suspend(id, motivo);
+      setMsg(res.body?.msg || (res.ok ? 'Suspendido' : 'Error'), res.ok ? 'warning' : 'danger');
       load();
     }
+
     if (act === 'reactivate') {
       const res = await API.reactivate(id);
-      setMsg(res.body?.message || (res.ok ? 'Reactivado' : 'Error'), res.ok ? 'success' : 'danger');
+      setMsg(res.body?.msg || (res.ok ? 'Reactivado' : 'Error'), res.ok ? 'success' : 'danger');
       load();
     }
   });
@@ -93,7 +120,7 @@ form.addEventListener('submit', async (e) => {
   try {
     await API.create(data);
     form.reset();
-    setMsg('Usuario creado.', 'success');
+    setMsg('Usuario creado (admin).', 'success');
     load();
   } catch {
     setMsg('Error creando usuario', 'danger');
