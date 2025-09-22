@@ -1,59 +1,15 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const Usuario = require("../models/userModel");
-const jwt = require("jsonwebtoken");
 const { verificarToken } = require("../../../middlewares/auth");
+const { register, verifyAccount } = require ("../controllers/userController.js");
 
 const router = express.Router();
 
 // 📌 Registro de usuario
-router.post("/usuarios/register", async (req, res) => {
-  try {
-    console.log("Datos recibidos en el body:", req.body);
-    const { nombres, apellidos, apodo, avatar, email, password, confirmPassword } = req.body;
+router.post("/register", register);
 
-    // 🔹 Validar contraseñas
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Las contraseñas no coinciden" });
-    }
-
-    // 🔹 Verificar si ya existe el email
-    const existeEmail = await Usuario.findOne({ email });
-    if (existeEmail) {
-      return res.status(400).json({ message: "El correo ya está registrado" });
-    }
-
-    // 🔹 Verificar si ya existe el apodo
-    const existeApodo = await Usuario.findOne({ apodo });
-    if (existeApodo) {
-      return res.status(400).json({ message: "El apodo ya está en uso" });
-    }
-
-    // 🔹 Encriptar contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 🔹 Crear nuevo usuario
-    const nuevoUsuario = new Usuario({
-      nombres,
-      apellidos,
-      apodo,
-      avatar,
-      email,
-      password: hashedPassword
-    });
-
-    await nuevoUsuario.save();
-
-    res.status(201).json({
-      message: "Usuario registrado con éxito",
-      usuario: nuevoUsuario
-    });
-
-  } catch (error) {
-    console.error("Error en registro:", error);
-    res.status(500).json({ message: "Error en el servidor", error });
-  }
-});
+//Verificar cuenta mediante correo
+router.get("/verify/:token", verifyAccount);
 
 router.post("/usuarios/login", async (req, res) => {
   try {
